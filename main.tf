@@ -10,9 +10,15 @@ provider "netlify" {
   token = var.netlify_token
 }
 
-data "netlify_site" "main" {
-  name = "terraform-simple-test"
-  team_slug = var.netlify_team_slug
+resource "null_resource" "deploy_site" {
+  provisioner "local-exec" {
+    command = <<EOT
+      netlify sites:create --name terraform-simple-site-${terraform.workspace} --auth ${var.netlify_token} --git ${var.github_repo} --team ${var.netlify_team_slug}
+    EOT
+    environment = {
+      NETLIFY_AUTH_TOKEN = var.netlify_token
+    }
+  }
 }
 
 variable "netlify_token" {
@@ -32,5 +38,5 @@ variable "github_repo" {
 
 output "netlify_site_url" {
   description = "URL of the deployed Netlify site"
-  value       = data.netlify_site.main
+  value       = "https://terraform-simple-site-${terraform.workspace}.netlify.app"
 }
