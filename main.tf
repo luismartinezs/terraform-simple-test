@@ -2,7 +2,6 @@ terraform {
   required_providers {
     netlify = {
       source  = "netlify/netlify"
-      version = "~> 0.5.0"
     }
   }
 }
@@ -11,19 +10,19 @@ provider "netlify" {
   token = var.netlify_token
 }
 
-resource "netlify_site" "main" {
-  name = "my-simple-website"
-
-  repo {
-    provider    = "github"
-    repo_path   = var.github_repote
-    branch      = "main"
-  }
+data "netlify_site" "main" {
+  name = "terraform-simple-test"
+  team_slug = var.netlify_team_slug
 }
 
 variable "netlify_token" {
   type        = string
   description = "Netlify personal access token"
+}
+
+variable "netlify_team_slug" {
+  type        = string
+  description = "Netlify team slug"
 }
 
 variable "github_repo" {
@@ -33,5 +32,5 @@ variable "github_repo" {
 
 output "netlify_site_url" {
   description = "URL of the deployed Netlify site"
-  value       = netlify_site.main.site_url
+  value       = data.netlify_site.main
 }
